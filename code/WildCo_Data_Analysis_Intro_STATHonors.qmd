@@ -1,0 +1,99 @@
+---
+title: "WildCo_Data_Analysis_Intro"
+author: "Oliver Fisher"
+format: 
+  html:
+    self-contained: true
+---
+
+CRAN packages
+
+```{r}
+# A list of the required packages
+list.of.packages <- c("activity",
+                      "corrplot",
+                      "cowplot",
+                      "dplyr", 
+                      "elevatr",
+                      "gfcanalysis",  
+                      "ggplot2",
+                      "gridExtra",
+                      "iNEXT",
+                      "kableExtra",
+                      "Hmsc",
+                      "leaflet",
+                      "lme4",
+                      "lubridate",
+                      "magrittr",
+                      "MCMCvis",
+                      "MODISTools",
+                      "osmdata",
+                      "pals",
+                      "plotly",
+                      "remotes",
+                      "rmarkdown",
+                      "sf",
+                      "spOccupancy",
+                      "stars",
+                      "stringr",
+                      "terra",
+                      "tibble",
+                      "tidyr", 
+                      "unmarked",
+                      "viridis",
+                      "jtools",
+                      "vegan",
+                      "MuMIn",
+                      "rgdal",
+                      "usedist",
+                      "taxize")
+
+# A check to see which ones you have and which are missing
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+
+# Code which tells R to install the missing packages
+if(length(new.packages)) install.packages(new.packages)
+lapply(list.of.packages, require, character.only = TRUE)
+```
+
+Other Packages
+
+```{r}
+# We use the remotes package to access package repositories not on the 
+# CRAN interface (e.g. on github)
+library(remotes)
+
+remotes::install_github("RS-eco/traitdata")
+remotes::install_github("arcaravaggi/remBoot")
+remotes::install_github("annam21/spaceNtime")
+```
+
+Google Earth Engine Package
+
+```{r}
+install.packages("rgee")
+library("rgee")
+```
+
+Image rename code: unique code (e.g. placename_datetime) which will ensure that line of data you generate can be traced back to an image, regardless of how it is stored.
+
+The Standard Form
+
+-   *Project data* `proj.csv` a dataframe containing key information about the project itself, e.g. how the cameras were deployed and what the target features were.
+
+-   *Image data* `img.csv` a dataframe containing all of the information contained within each image. This information is typically added by humans, but increasing we are using artificial intelligence to speed up this process.
+
+-   *Deployment data* `dep.csv` a dataframe listing the activity of the camera traps involved in your study, and any issues encountered during deployments which may influence their analysis
+
+-   *Camera data* `cam.csv` a dataframe all the cameras deployed in the project
+
+```{r}
+pro <- read.csv("data/raw_data/example_data/proj.csv", header=T)
+img <- read.csv("data/raw_data/example_data/img.csv", header=T)
+dep <- read.csv("data/raw_data/example_data/dep.csv", header=T)
+cam <- read.csv("data/raw_data/example_data/cam.csv", header=T)
+
+## Where data??
+```
+
+
