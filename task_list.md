@@ -1,3 +1,11 @@
+## For September 21
+
+1. Follow along with code from <https://cran.r-project.org/web/packages/overlap/vignettes/overlap.pdf>
+
+    1. Change some function arguments with kerinci data in the package.
+
+2. Chapter 12 <https://bookdown.org/c_w_beirne/wildCo-Data-Analysis/activity.html> (will not be able to follow along).
+
 ## For September 14
 
 1. https://cran.r-project.org/web/packages/overlap/vignettes/overlap.pdf
