@@ -97,3 +97,12 @@ cam <- read.csv("data/raw_data/example_data/cam.csv", header=T)
 ```
 
 
+Foundations of detection
+- The Independent detections dataf rame is the work horse of the vast majority of camera trap analyses,
+- Effort data (names/location/date/time labeling)
+- Observation by time intervals
+
+Note Expand on section 7
+
+
+Note see 7.4 for help with STAT313 project
