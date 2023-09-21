@@ -1,3 +1,15 @@
+## For September 28
+
+1. Section 3.2 of vignette (MH: look at delta 4 estimators).
+
+2. Data Exploration
+
+    1. variable should have correct types
+    
+    2. exploratory plots of the species (over time)
+    
+    3. exploratory summary stats of the species.
+
 ## For September 21
 
 1. Follow along with code from <https://cran.r-project.org/web/packages/overlap/vignettes/overlap.pdf>
