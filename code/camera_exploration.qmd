@@ -1,0 +1,11 @@
+---
+title: "Camera Trap Exploration"
+format: html
+---
+
+```{r}
+library(tidyverse)
+library(here)
+camera_df <- read_csv(here("data/camera_trap.csv"))
+camera_df
+```
