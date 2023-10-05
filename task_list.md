@@ -1,3 +1,17 @@
+## For October 5
+
+1. Section 3.2 of vignette (MH: look at delta 4 estimators).
+
+2. Review DATA/STAT 234 (<https://highamm.github.io/ds234_quarto/03-dplyr.html>)
+
+3. Data Exploration
+
+    1. variable should have correct types
+    
+    2. exploratory plots of the species (over time)
+    
+    3. exploratory summary stats of the species.
+
 ## For September 28
 
 1. Section 3.2 of vignette (MH: look at delta 4 estimators).
