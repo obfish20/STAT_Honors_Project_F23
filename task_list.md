@@ -1,3 +1,13 @@
+## For October 19
+
+1. Look into date functions: <https://highamm.github.io/ds234_quarto/11-lubridate.html#functions-for-date-variables>
+
+2. Goal: Create a plot for a single species with density on y-axis, time of day on x-axis, and tick marks for species occurrence using either `overlap` or `camtrapr` packages. 
+
+    1. If having enough time, compare distributions of different species and/or compare a single species abundance distribution across different forests or different forest types.
+    
+Extra source: <https://jniedballa.github.io/camtrapR/articles/camtrapr4.html>
+
 ## For October 5
 
 1. Section 3.2 of vignette (MH: look at delta 4 estimators).
