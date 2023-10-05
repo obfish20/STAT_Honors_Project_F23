@@ -6,6 +6,55 @@ format: html
 ```{r}
 library(tidyverse)
 library(here)
+library(lubridate)
 camera_df <- read_csv(here("data/camera_trap.csv"))
 camera_df
 ```
+
+```{r}
+## summary stats
+summary(camera_trap)
+count(camera_trap)
+```
+
+
+```{r}
+## variable should have correct types
+
+
+camera_df2 <- camera_df |> separate(col = DTO, into = c("Date", "Time"), sep = " ") |>
+  mutate(Year = mdy(Date)) |>
+  select(Year, everything())
+camera_df2
+
+
+camera_df3 <- camera_df2 |> group_by(choice) |>
+  summarise(n = n(), prop = n/2127)
+camera_df3
+
+## exploratory plots of the species (over time)
+
+
+ggplot(data = camera_df2, aes(x = Year, y = choice)) +
+  geom_point()
+```
+
+
+
+```{r}
+## Tables
+table(camera_df$Forest)
+table(camera_df$choice)
+
+
+separate(col = Player, into = c("First_name", "Last_name"), 
+           sep = ", ")
+
+```
+
+Variables of Current interest
+- Date
+- Time
+- Forest 
+- choice
+
