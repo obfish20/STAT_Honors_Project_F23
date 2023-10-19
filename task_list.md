@@ -1,3 +1,17 @@
+## For October 26
+
+1. Make time continuous, not discrete so that the ticks show up on the rug part of the plot.
+
+2. Comparing months on the overlap for one particular species.
+
+3. Keep in mind that we can switch to ggplot with their density data frame output:
+
+```
+ggplot(data = test_plot, aes(x = x, y = densityA)) +
+  geom_line() +
+  theme_minimal()
+```
+
 ## For October 19
 
 1. Look into date functions: <https://highamm.github.io/ds234_quarto/11-lubridate.html#functions-for-date-variables>
