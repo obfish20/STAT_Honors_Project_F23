@@ -13,10 +13,12 @@ camera_df
 
 ```{r}
 ## summary stats
-summary(camera_trap)
-count(camera_trap)
+summary(camera_df)
+count(camera_df)
 ```
 
+
+### Oct 5 Work
 
 ```{r}
 ## variable should have correct types
@@ -45,11 +47,6 @@ ggplot(data = camera_df2, aes(x = Year, y = choice)) +
 ## Tables
 table(camera_df$Forest)
 table(camera_df$choice)
-
-
-separate(col = Player, into = c("First_name", "Last_name"), 
-           sep = ", ")
-
 ```
 
 Variables of Current interest
@@ -58,3 +55,135 @@ Variables of Current interest
 - Forest 
 - choice
 -
+
+
+### Oct 19 Work
+
+Goal: Create a plot for a single species with density on y-axis, time of day on x-axis, and tick marks for species occurrence using either overlap or camtrapr packages.
+
+
+```{r}
+library(overlap)
+library(lubridate)
+
+## Convert 0:00 to 23:59 => 0 to 0.99
+## https://stackoverflow.com/questions/67613393/convert-time-to-fraction-of-a-day-fraction-of-a-week-and-fraction-of-a-month-in
+camera_df4 <- camera_df |> mutate(time = mdy_hm(DTO), 
+         frac_day = hour(time)/24,
+         frac_week = (lubridate::wday(time, week_start = 1) - 1 + frac_day)/7, 
+         frac_month = (day(time) - 1 + frac_day)/days_in_month(time),
+         time = round(frac_day,3),
+         week = round(frac_week,3),
+         month = round(frac_month,3),)
+
+table(camera_df4$choice)
+
+range(camera_df4$time)
+
+## Convert radians to degrees
+timeRad <- camera_df4$time * 2 * pi
+
+## Fitting kernel density
+deer <- timeRad[camera_df4$choice == 'DEERWHITETAILED']
+densityPlot(deer, rug=TRUE)
+# where are my tick marks
+
+
+
+marten <- timeRad[camera_df4$choice == 'AMERICANPINEMARTEN']
+beaver <- timeRad[camera_df4$choice == 'BEAVER']
+blackbear <- timeRad[camera_df4$choice == 'BLACKBEAR']
+bluebird <- timeRad[camera_df4$choice == 'BLUEJAY']
+
+
+rabbit <- timeRad[camera_df4$choice == 'COTTONTAILRABBIT']
+coyote <- timeRad[camera_df4$choice == 'COYOTE']
+raven <- timeRad[camera_df4$choice == 'CROWORRAVEN']
+dog <- timeRad[camera_df4$choice == 'DOMESTICDOG']
+
+fisher <- timeRad[camera_df4$choice == 'FISHER']
+fox_g <- timeRad[camera_df4$choice == 'FOXGRAY']
+fox_r <- timeRad[camera_df4$choice == 'FOXRED']
+goose <- timeRad[camera_df4$choice == 'GOOSEWILD']
+grouse <- timeRad[camera_df4$choice == 'GROUSERUFFED']
+
+mink <- timeRad[camera_df4$choice == 'MINK']
+mole <- timeRad[camera_df4$choice == 'MOLE']
+m_loin <- timeRad[camera_df4$choice == 'MOUNTAINLION']
+possum <- timeRad[camera_df4$choice == 'OPOSSUM']
+
+
+live_stock <- timeRad[camera_df4$choice == 'OTHERDOMESTICSTOCK']
+
+owl <- timeRad[camera_df4$choice == 'OWL']
+spiky <- timeRad[camera_df4$choice == 'PORCUPINE']
+
+
+reptile <- timeRad[camera_df4$choice == 'REPTILEORAMPHIBIAN']
+otter <- timeRad[camera_df4$choice == 'RIVEROTTER']
+hare <- timeRad[camera_df4$choice == 'SNOWSHOEHARE']
+squirrel_f <- timeRad[camera_df4$choice == 'SQUIRRELFLYING']
+
+
+squirrel_r <- timeRad[camera_df4$choice == 'SQUIRRELRED']
+turkey <- timeRad[camera_df4$choice == 'TURKEY']
+weasel <- timeRad[camera_df4$choice == 'WEASEL']
+woodchuck <- timeRad[camera_df4$choice == 'WOODCHUCK']
+
+## popular sightings n > 100
+chipmunk <- timeRad[camera_df4$choice == 'CHIPMUNK']
+deer <- timeRad[camera_df4$choice == 'DEERWHITETAILED']
+bird <- timeRad[camera_df4$choice == 'OTHERBIRD']
+small_mammal <- timeRad[camera_df4$choice == 'OTHERSMALLMAMMAL']
+robber <- timeRad[camera_df4$choice == 'RACCOON']
+squirrel_g <- timeRad[camera_df4$choice == 'SQUIRRELGRAY']
+
+## compare distributions of different species
+
+# compare predictor and prey
+pp <- overlapEst(deer, coyote, type="Dhat4")
+pp
+
+
+overlapPlot(deer, coyote)
+legend('topright', c("DEERWHITETAILED", "COYOTE"), lty=c(1,2), col=c(1,4), bty='n')
+```
+
+```{r}
+## historgram of counts
+ggplot(data = camera_df3, aes(x = n(choice, y = n))) +
+  geom_col()
+```
+
+
+```{r}
+##  compare a single species abundance distribution across different forests
+forest_df <- camera_df |>  group_by(Forest) |>
+  summarise(n = n())
+forest_df
+ggplot(data = forest_df, aes(x = Forest, y = n)) +
+  geom_col()
+
+
+# For Deer
+deer_forest <- camera_df |> filter(choice == "DEERWHITETAILED") |> 
+  group_by(Forest) |> summarise(deer = n())
+deer_forest
+
+ggplot(data = deer_forest, aes(x = Forest, y = deer)) +
+  geom_col()
+
+
+# For Squirrels
+squirrel_forest <- camera_df |> filter(choice == "SQUIRRELGRAY") |> 
+  group_by(Forest) |> summarise(squirrels = n())
+squirrel_forest
+
+ggplot(data = squirrel_forest, aes(x = Forest, y = squirrels)) +
+  geom_col()
+
+
+table(camera_df$Forest)
+
+```
+
