@@ -1,3 +1,11 @@
+## For November 2
+
+1. Introduce to functions <https://r4ds.had.co.nz/functions.html>
+
+2. Write function discussed on sheet.
+
+3. Begin writing draft.
+
 ## For October 26
 
 1. Make time continuous, not discrete so that the ticks show up on the rug part of the plot.
