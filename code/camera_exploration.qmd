@@ -78,6 +78,8 @@ camera_df4 <- camera_df |> mutate(time = mdy_hm(DTO),
 
 table(camera_df4$choice)
 
+table(camera_df4$time)
+
 range(camera_df4$time)
 
 ## Convert radians to degrees
@@ -85,6 +87,7 @@ timeRad <- camera_df4$time * 2 * pi
 
 ## Fitting kernel density
 deer <- timeRad[camera_df4$choice == 'DEERWHITETAILED']
+
 densityPlot(deer, rug=TRUE)
 # where are my tick marks
 
@@ -185,5 +188,92 @@ ggplot(data = squirrel_forest, aes(x = Forest, y = squirrels)) +
 
 table(camera_df$Forest)
 
+```
+
+
+### Oct 26 Work
+
+```{r}
+library(overlap)
+library(lubridate)
+
+## Convert 0:00 to 23:59 => 0 to 0.99
+## https://stackoverflow.com/questions/67613393/convert-time-to-fraction-of-a-day-fraction-of-a-week-and-fraction-of-a-month-in
+camera_df5 <- camera_df |> mutate(time = mdy_hm(DTO), 
+         frac_day = ((hour(time)*60 + minute(time))/60)/24,
+         frac_week = (lubridate::wday(time, week_start = 1) - 1 + frac_day)/7, 
+         frac_month = (day(time) - 1 + frac_day)/days_in_month(time),
+         time = round(frac_day,3),
+         week = round(frac_week,3),
+         month = round(frac_month,3),)
+
+table(camera_df5$choice)
+
+range(camera_df5$time)
+
+## Convert radians to degrees
+timeRad <- camera_df5$time * 2 * pi
+
+## Fitting kernel density
+deer <- timeRad[camera_df5$choice == 'DEERWHITETAILED']
+
+densityPlot(deer, rug=TRUE)
+# where are my tick marks
+
+camera_df5$frac_day
+```
+
+Comparison by months
+```{r}
+camera_deer <- camera_df2 |> filter(choice == 'DEERWHITETAILED')
+camera_sqg <- camera_df2 |> filter(choice == 'SQUIRRELGRAY')
+
+ggplot(camera_df2, aes(x = Date, y = choice)) + 
+    geom_histogram(data = camera_deer, fill = "red", alpha = 0.2) + 
+    geom_histogram(data = camera_sqg, fill = "blue", alpha = 0.2)
+```
+
+
+```{r}
+## Convert radians to degrees
+monthRad <- camera_df5$week * 2 * pi
+
+## Fitting kernel density
+deer_month <- monthRad[camera_df5$choice == 'DEERWHITETAILED']
+squirrel_g_month <- monthRad[camera_df5$choice == 'SQUIRRELGRAY']
+
+# compare 
+pp <- overlapEst(deer_month, squirrel_g_month, type="Dhat4")
+pp
+
+
+overlapPlot(deer_month, squirrel_g_month)
+legend('topright', c("DEERWHITETAILED", "COYOTE"), lty=c(1,2), col=c(1,4), bty='n')
+
+table(camera_df5$month)
+
+## Can seem to solve issue of time x lab
+deermonth_df <- camera_df2 |> filter(choice == "DEERWHITETAILED") |> 
+  mutate(date = mdy(Date)) |> group_by(month(date))
+
+ggplot(data = deermonth_df, aes(x = date, y = choice)) +
+  geom_col() +
+  theme_minimal()
+```
+
+
+### Nov 2 Work
+
+```{r}
+time_df <- camera_df2 |> group_by(date = mdy(Date)) |>
+  interval(ymd("2022-07-01"), ymd("2022-09-01")) |>
+  filter(choice == "DEERWHITETAILED") |>
+  summarise(count_deer = n())
+  
+
+
+ggplot(data = inter_time, aes(x = date, y = count_deer)) +
+  geom_histogram() +
+  theme_minimal()
 ```
 
