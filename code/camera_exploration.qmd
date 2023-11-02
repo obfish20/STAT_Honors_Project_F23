@@ -12,7 +12,7 @@ camera_df
 ```
 
 ```{r}
-## summary stats
+## summary statsvir
 summary(camera_df)
 count(camera_df)
 ```
@@ -24,7 +24,8 @@ count(camera_df)
 ## variable should have correct types
 
 
-camera_df2 <- camera_df |> separate(col = DTO, into = c("Date", "Time"), sep = " ") |>
+camera_df2 <- camera_df |> 
+  separate(col = DTO, into = c("Date", "Time"), sep = " ") |>
   mutate(Year = mdy(Date)) |>
   select(Year, everything())
 camera_df2
@@ -252,11 +253,18 @@ legend('topright', c("DEERWHITETAILED", "COYOTE"), lty=c(1,2), col=c(1,4), bty='
 
 table(camera_df5$month)
 
-## Can seem to solve issue of time x lab
+
+## count by month
 deermonth_df <- camera_df2 |> filter(choice == "DEERWHITETAILED") |> 
   mutate(date = mdy(Date)) |> group_by(month(date))
 
-ggplot(data = deermonth_df, aes(x = date, y = choice)) +
+time_df <- camera_df2 |> group_by(date = mdy(Date)) |>
+  group_by(months = month(date)) |>
+  mutate(factor(months)) |>
+  filter(choice == "DEERWHITETAILED") |>
+  summarise(count_deer = n())
+
+ggplot(data = time_df, aes(x = months, y = count_deer)) +
   geom_col() +
   theme_minimal()
 ```
@@ -265,15 +273,6 @@ ggplot(data = deermonth_df, aes(x = date, y = choice)) +
 ### Nov 2 Work
 
 ```{r}
-time_df <- camera_df2 |> group_by(date = mdy(Date)) |>
-  interval(ymd("2022-07-01"), ymd("2022-09-01")) |>
-  filter(choice == "DEERWHITETAILED") |>
-  summarise(count_deer = n())
-  
 
-
-ggplot(data = inter_time, aes(x = date, y = count_deer)) +
-  geom_histogram() +
-  theme_minimal()
 ```
 
