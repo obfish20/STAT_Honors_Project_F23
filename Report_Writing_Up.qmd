@@ -3,3 +3,71 @@ title: "Report Write Up"
 format: docx
 ---
 
+### Introductin 
+
+Purpose:
+-> This purpose of this project is to further explore the presents for local animals caught on camera trap data taken over the past 3 years, through lens of a time laps plot. Through this plot we might better understand the changes in presents of certain species such as Deer and Grey Squirrels. We can then also visulaizes interactions of species throughout the days and seasons with functions such as overlap.
+
+Background
+-> Camera trap: review camera trap summary
+-> camera trap location (forest)
+Degrasse
+Kip tract
+Donnerville
+Lampson
+Donnerville - Ash
+Lampson Falls
+ELB
+Peavine
+Kip
+South Hammond
+
+-> Wildlife in Upstate NY caught on camera trap
+
+marten. 
+beaver
+black bear
+blue Jay
+rabbit
+coyote 
+raven
+dog 
+fisher 
+grey fox
+red fox
+wild goose
+grouse ruffed
+mink 
+mole 
+mountain loin 
+opossum
+other domestic live stock 
+owl
+porcupine
+reptile or Ampphibian 
+river otter
+snow shoe hare
+flying squirrel
+red squirrel
+turkey
+weasel
+woodchuck
+
+## popular sightings n > 100
+chipmunk
+white tailed deer
+other birds
+other small mammal
+raccoon
+gray squirrel
+
+-> Density estimation method
+
+
+### Data exploration
+
+Study site description 
+
+Table of variables
+
+
