@@ -8,6 +8,13 @@ camera_df <- read_csv(here("data/camera_trap.csv"))
 ## I think the issue here is that the code does not work for any date
 ## (we haven't yet got to the "wrapping in a function" part).
 
+camera_df2 <- camera_df |> 
+  separate(col = DTO, into = c("Date", "Time"), sep = " ") |>
+  mutate(Year = mdy(Date)) |>
+  select(Year, everything())
+camera_df2
+
+
 time_df <- camera_df2 |> group_by(date = mdy(Date)) |>
   filter(choice == "DEERWHITETAILED") |>
   summarise(count_deer = n())
@@ -48,4 +55,22 @@ get_interval_data(date_choice = "2022-10-10")
 
 time_df <- get_interval_data(date_choice = "2022-10-10") |>
   group_by(date = mdy(Date)) |>
-  summarise(count_deer = n())
+  summarise(count_deer = n()) 
+
+## Function to create smooth dataframe
+
+timemin <- camera_df2 |> arrange(mdy(Date))
+timemax <- camera_df2 |> arrange(desc(mdy(Date)))
+
+smooth_deer <- function(date_choice) {
+  timeline |> 
+    filter(Year >= ymd(date_choice) - 30 &
+             Year <= ymd(date_choice) + 30) |>
+    filter(choice == "DEERWHITETAILED") |>
+    summarise(count_deer = n()) 
+}
+
+
+max(timeline$Date)
+
+smooth_deer_df <- smooth_deer
