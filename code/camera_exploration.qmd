@@ -12,7 +12,7 @@ camera_df
 ```
 
 ```{r}
-## summary statsvir
+## summary stats
 summary(camera_df)
 count(camera_df)
 ```
@@ -69,6 +69,7 @@ library(lubridate)
 
 ## Convert 0:00 to 23:59 => 0 to 0.99
 ## https://stackoverflow.com/questions/67613393/convert-time-to-fraction-of-a-day-fraction-of-a-week-and-fraction-of-a-month-in
+
 camera_df4 <- camera_df |> mutate(time = mdy_hm(DTO), 
          frac_day = hour(time)/24,
          frac_week = (lubridate::wday(time, week_start = 1) - 1 + frac_day)/7, 

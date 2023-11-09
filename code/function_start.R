@@ -15,9 +15,8 @@ camera_df2 <- camera_df |>
 camera_df2
 
 
-time_df <- camera_df2 |> group_by(date = mdy(Date)) |>
-  filter(choice == "DEERWHITETAILED") |>
-  summarise(count_deer = n())
+
+  
 
 
 ## anyway, the first goal is to create a filtered data set for a date range
@@ -28,10 +27,7 @@ camera_df2 <- camera_df |>
   mutate(Year = mdy(Date)) |>
   select(Year, everything())
 
-test_date <- "2022-08-05"
-see <- camera_df2 |> 
-  filter(Year >= ymd(test_date) - 30 &
-           Year <= ymd(test_date) + 30) |>
+deer_stat <- camera_df2 |>
   filter(choice == "DEERWHITETAILED")
 
 ## after that is working, we want to wrap it in a function to return
@@ -50,27 +46,20 @@ get_interval_data <- function(date_choice) {
 ## now, I can test my function on a couple of dates:
 ## 
 
-get_interval_data(date_choice = "2021-07-02")
-get_interval_data(date_choice = "2022-10-10")
+get_interval_data(date_choice = "2024-08-28")
+get_interval_data(date_choice = "2021-07-03")
 
 time_df <- get_interval_data(date_choice = "2022-10-10") |>
   group_by(date = mdy(Date)) |>
-  summarise(count_deer = n()) 
+  summarise(count_deer = n())
 
 ## Function to create smooth dataframe
 
-timemin <- camera_df2 |> arrange(mdy(Date))
+timemin <- camera_df2 |> arrange(Year)
+## 2021-07-03
 timemax <- camera_df2 |> arrange(desc(mdy(Date)))
-
-smooth_deer <- function(date_choice) {
-  timeline |> 
-    filter(Year >= ymd(date_choice) - 30 &
-             Year <= ymd(date_choice) + 30) |>
-    filter(choice == "DEERWHITETAILED") |>
-    summarise(count_deer = n()) 
-}
+## 2024-08-28
 
 
-max(timeline$Date)
 
-smooth_deer_df <- smooth_deer
+smooth_deer_df <- data.frame(lapply(camera_df2, get_interval_data))
