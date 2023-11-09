@@ -1,4 +1,12 @@
-## For November 2
+## For November 16
+
+1. Write function discussed on sheet (using things in `camera_exploration.qmd`).
+
+2. Look up how to get a series of dates given a min and a max.
+
+3. Use `map()` from `purrr` to attempt to iterate over a bunch of dates.
+
+## For November 2 / 9
 
 1. Introduce to functions <https://r4ds.had.co.nz/functions.html>
 
