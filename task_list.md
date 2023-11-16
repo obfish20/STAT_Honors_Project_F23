@@ -1,3 +1,17 @@
+## For November 23
+
+1. Remove code from function and get it to work on its own.
+
+    1. Add code back into function and work with function.
+    
+2. Create a range of date sequences from the minimum date to the maximum date.
+
+3. Research `map()` function <https://r4ds.had.co.nz/iteration.html?q=map(#the-map-functions>
+
+4. Use `coord_polar()` 
+
+5. gganimate with <https://stackoverflow.com/questions/57497800/gganimate-transition-between-states-with-static-lines>
+
 ## For November 16
 
 1. Write function discussed on sheet (using things in `camera_exploration.qmd`).
