@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Animated Time Plot for Camera Trap Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="Final_Presentation_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Final_Presentation_files/libs/quarto-html/quarto.js"></script>
+<script src="Final_Presentation_files/libs/quarto-html/popper.min.js"></script>
+<script src="Final_Presentation_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Final_Presentation_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Final_Presentation_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Final_Presentation_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Final_Presentation_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Final_Presentation_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Final_Presentation_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Animated Time Plot for Camera Trap Data</h1>
+<p class="subtitle lead">by Oliver Fisher</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<div class="cell" data-screenshot.opts="{&quot;delay&quot;:3}" data-hash="Final_Presentation_cache/html/webshot_b02daae1510908f8d824e7d8b87ea270">
+<div class="cell-output cell-output-stderr">
+<pre><code>PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>phantomjs has been installed to /Users/highamm/Library/Application Support/PhantomJS</code></pre>
+</div>
+<iframe src="https://natureupnorth.shinyapps.io/NoCoWildShinyApp/?showcase=0" width="1440" height="400px" data-external="1">
+</iframe>
+</div>
+</section>
+<section id="data-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="data-exploration">Data exploration</h2>
+<section id="forest" class="level3">
+<h3 class="anchored" data-anchor-id="forest">Forest</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+         Degrasse       Donnerville Donnerville - Ash               ELB 
+              189               395                89                69 
+              Kip         Kip tract           Lampson     Lampson Falls 
+              174               567                40                88 
+          Peavine     South Hammond 
+              247               217 </code></pre>
+</div>
+</div>
+</section>
+<section id="species" class="level3">
+<h3 class="anchored" data-anchor-id="species">Species</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+AMERICANPINEMARTEN             BEAVER          BLACKBEAR            BLUEJAY 
+                 1                  2                 27                 12 
+          CHIPMUNK   COTTONTAILRABBIT             COYOTE        CROWORRAVEN 
+               111                 31                 25                  1 
+   DEERWHITETAILED        DOMESTICDOG             FISHER            FOXGRAY 
+               532                 25                  4                  4 
+            FOXRED          GOOSEWILD       GROUSERUFFED               MINK 
+                 8                  1                  5                  1 
+              MOLE       MOUNTAINLION            OPOSSUM          OTHERBIRD 
+                 3                  1                  3                131 
+OTHERDOMESTICSTOCK   OTHERSMALLMAMMAL                OWL          PORCUPINE 
+                 2                303                  1                  2 
+           RACCOON REPTILEORAMPHIBIAN         RIVEROTTER       SNOWSHOEHARE 
+               259                  2                  1                  4 
+    SQUIRRELFLYING       SQUIRRELGRAY        SQUIRRELRED             TURKEY 
+                 3                539                 52                 29 
+            WEASEL          WOODCHUCK 
+                 1                  1 </code></pre>
+</div>
+</div>
+</section>
+<section id="range" class="level3">
+<h3 class="anchored" data-anchor-id="range">Range</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+2021-07-03 2021-12-04 
+         1          1 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+2022-07-26 2022-12-13 
+         1          1 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+2023-02-03 2023-04-01 
+         1          1 </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="overlap" class="level2">
+<h2 class="anchored" data-anchor-id="overlap">Overlap</h2>
+<section id="squirrelgray-centered-at-2022-08-28" class="level4">
+<h4 class="anchored" data-anchor-id="squirrelgray-centered-at-2022-08-28">SQUIRRELGRAY centered at 2022-08-28</h4>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Final_Presentation_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+              x            y date_choice n_obs
+1   -3.00000000 4.599714e-03  2022-08-28   138
+2   -2.76377953 4.249063e-03  2022-08-28   138
+3   -2.52755906 3.936475e-03  2022-08-28   138
+4   -2.29133858 3.490941e-03  2022-08-28   138
+5   -2.05511811 2.890349e-03  2022-08-28   138
+6   -1.81889764 2.208974e-03  2022-08-28   138
+7   -1.58267717 1.551421e-03  2022-08-28   138
+8   -1.34645669 1.000198e-03  2022-08-28   138
+9   -1.11023622 5.922485e-04  2022-08-28   138
+10  -0.87401575 3.225753e-04  2022-08-28   138
+11  -0.63779528 1.619464e-04  2022-08-28   138
+12  -0.40157480 7.513087e-05  2022-08-28   138
+13  -0.16535433 3.230150e-05  2022-08-28   138
+14   0.07086614 1.291140e-05  2022-08-28   138
+15   0.30708661 4.814890e-06  2022-08-28   138
+16   0.54330709 1.681498e-06  2022-08-28   138
+17   0.77952756 5.521388e-07  2022-08-28   138
+18   1.01574803 1.711960e-07  2022-08-28   138
+19   1.25196850 5.035321e-08  2022-08-28   138
+20   1.48818898 1.414047e-08  2022-08-28   138
+21   1.72440945 3.918902e-09  2022-08-28   138
+22   1.96062992 1.530915e-09  2022-08-28   138
+23   2.19685039 2.497468e-09  2022-08-28   138
+24   2.43307087 8.977794e-09  2022-08-28   138
+25   2.66929134 3.414049e-08  2022-08-28   138
+26   2.90551181 1.256475e-07  2022-08-28   138
+27   3.14173228 4.430895e-07  2022-08-28   138
+28   3.37795276 1.490345e-06  2022-08-28   138
+29   3.61417323 4.762101e-06  2022-08-28   138
+30   3.85039370 1.440184e-05  2022-08-28   138
+31   4.08661417 4.108391e-05  2022-08-28   138
+32   4.32283465 1.102122e-04  2022-08-28   138
+33   4.55905512 2.772772e-04  2022-08-28   138
+34   4.79527559 6.526967e-04  2022-08-28   138
+35   5.03149606 1.434767e-03  2022-08-28   138
+36   5.26771654 2.940850e-03  2022-08-28   138
+37   5.50393701 5.614885e-03  2022-08-28   138
+38   5.74015748 9.980942e-03  2022-08-28   138
+39   5.97637795 1.652022e-02  2022-08-28   138
+40   6.21259843 2.548216e-02  2022-08-28   138
+41   6.44881890 3.669164e-02  2022-08-28   138
+42   6.68503937 4.945262e-02  2022-08-28   138
+43   6.92125984 6.263392e-02  2022-08-28   138
+44   7.15748031 7.494218e-02  2022-08-28   138
+45   7.39370079 8.527939e-02  2022-08-28   138
+46   7.62992126 9.302339e-02  2022-08-28   138
+47   7.86614173 9.810884e-02  2022-08-28   138
+48   8.10236220 1.009015e-01  2022-08-28   138
+49   8.33858268 1.019669e-01  2022-08-28   138
+50   8.57480315 1.018608e-01  2022-08-28   138
+51   8.81102362 1.010147e-01  2022-08-28   138
+52   9.04724409 9.970739e-02  2022-08-28   138
+53   9.28346457 9.807941e-02  2022-08-28   138
+54   9.51968504 9.615648e-02  2022-08-28   138
+55   9.75590551 9.388455e-02  2022-08-28   138
+56   9.99212598 9.118337e-02  2022-08-28   138
+57  10.22834646 8.800341e-02  2022-08-28   138
+58  10.46456693 8.434935e-02  2022-08-28   138
+59  10.70078740 8.024942e-02  2022-08-28   138
+60  10.93700787 7.569910e-02  2022-08-28   138
+61  11.17322835 7.064489e-02  2022-08-28   138
+62  11.40944882 6.505316e-02  2022-08-28   138
+63  11.64566929 5.903797e-02  2022-08-28   138
+64  11.88188976 5.296046e-02  2022-08-28   138
+65  12.11811024 4.741999e-02  2022-08-28   138
+66  12.35433071 4.312865e-02  2022-08-28   138
+67  12.59055118 4.073366e-02  2022-08-28   138
+68  12.82677165 4.066905e-02  2022-08-28   138
+69  13.06299213 4.307952e-02  2022-08-28   138
+70  13.29921260 4.780935e-02  2022-08-28   138
+71  13.53543307 5.442642e-02  2022-08-28   138
+72  13.77165354 6.226219e-02  2022-08-28   138
+73  14.00787402 7.047467e-02  2022-08-28   138
+74  14.24409449 7.815807e-02  2022-08-28   138
+75  14.48031496 8.450633e-02  2022-08-28   138
+76  14.71653543 8.898926e-02  2022-08-28   138
+77  14.95275591 9.145696e-02  2022-08-28   138
+78  15.18897638 9.210322e-02  2022-08-28   138
+79  15.42519685 9.129744e-02  2022-08-28   138
+80  15.66141732 8.938118e-02  2022-08-28   138
+81  15.89763780 8.654829e-02  2022-08-28   138
+82  16.13385827 8.287083e-02  2022-08-28   138
+83  16.37007874 7.844546e-02  2022-08-28   138
+84  16.60629921 7.356964e-02  2022-08-28   138
+85  16.84251969 6.883591e-02  2022-08-28   138
+86  17.07874016 6.505370e-02  2022-08-28   138
+87  17.31496063 6.297773e-02  2022-08-28   138
+88  17.55118110 6.293301e-02  2022-08-28   138
+89  17.78740157 6.452517e-02  2022-08-28   138
+90  18.02362205 6.662873e-02  2022-08-28   138
+91  18.25984252 6.771954e-02  2022-08-28   138
+92  18.49606299 6.642412e-02  2022-08-28   138
+93  18.73228346 6.202776e-02  2022-08-28   138
+94  18.96850394 5.470529e-02  2022-08-28   138
+95  19.20472441 4.539548e-02  2022-08-28   138
+96  19.44094488 3.542220e-02  2022-08-28   138
+97  19.67716535 2.606164e-02  2022-08-28   138
+98  19.91338583 1.822881e-02  2022-08-28   138
+99  20.14960630 1.235480e-02  2022-08-28   138
+100 20.38582677 8.427764e-03  2022-08-28   138
+101 20.62204724 6.123947e-03  2022-08-28   138
+102 20.85826772 4.961277e-03  2022-08-28   138
+103 21.09448819 4.436982e-03  2022-08-28   138
+104 21.33070866 4.132759e-03  2022-08-28   138
+105 21.56692913 3.778357e-03  2022-08-28   138
+106 21.80314961 3.266597e-03  2022-08-28   138
+107 22.03937008 2.621635e-03  2022-08-28   138
+108 22.27559055 1.937579e-03  2022-08-28   138
+109 22.51181102 1.315019e-03  2022-08-28   138
+110 22.74803150 8.193254e-04  2022-08-28   138
+111 22.98425197 4.690984e-04  2022-08-28   138
+112 23.22047244 2.472386e-04  2022-08-28   138
+113 23.45669291 1.202261e-04  2022-08-28   138
+114 23.69291339 5.408420e-05  2022-08-28   138
+115 23.92913386 2.257560e-05  2022-08-28   138
+116 24.16535433 8.772958e-06  2022-08-28   138
+117 24.40157480 3.185337e-06  2022-08-28   138
+118 24.63779528 1.084793e-06  2022-08-28   138
+119 24.87401575 3.479428e-07  2022-08-28   138
+120 25.11023622 1.055689e-07  2022-08-28   138
+121 25.34645669 3.044822e-08  2022-08-28   138
+122 25.58267717 8.433533e-09  2022-08-28   138
+123 25.81889764 2.447997e-09  2022-08-28   138
+124 26.05511811 1.536613e-09  2022-08-28   138
+125 26.29133858 4.060343e-09  2022-08-28   138
+126 26.52755906 1.535458e-08  2022-08-28   138
+127 26.76377953 5.776864e-08  2022-08-28   138
+128 27.00000000 2.091395e-07  2022-08-28   138
+
+[[2]]
+# A tibble: 138 × 2
+   time                date_choice
+   &lt;dttm&gt;              &lt;chr&gt;      
+ 1 2021-08-31 11:00:00 2022-08-28 
+ 2 2021-09-01 06:46:00 2022-08-28 
+ 3 2021-09-02 07:24:00 2022-08-28 
+ 4 2021-08-15 14:47:00 2022-08-28 
+ 5 2021-08-23 16:36:00 2022-08-28 
+ 6 2021-08-24 08:01:00 2022-08-28 
+ 7 2021-08-24 11:41:00 2022-08-28 
+ 8 2021-08-24 13:05:00 2022-08-28 
+ 9 2021-08-26 07:54:00 2022-08-28 
+10 2021-08-28 08:33:00 2022-08-28 
+# ℹ 128 more rows</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="animation-squirrel" class="level2">
+<h2 class="anchored" data-anchor-id="animation-squirrel">Animation (Squirrel)</h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Final_Presentation_files/figure-html/unnamed-chunk-7-1.gif" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="animation-raccoon" class="level2">
+<h2 class="anchored" data-anchor-id="animation-raccoon">Animation (Raccoon)</h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Final_Presentation_files/figure-html/unnamed-chunk-9-1.gif" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="animation-deer" class="level2">
+<h2 class="anchored" data-anchor-id="animation-deer">Animation (deer)</h2>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Final_Presentation_files/figure-html/unnamed-chunk-11-1.gif" class="img-fluid"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Final_Presentation_files/figure-html/unnamed-chunk-11-2.gif" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="thanks-to-erika-barthelmess-and-dr.-higham" class="level2">
+<h2 class="anchored" data-anchor-id="thanks-to-erika-barthelmess-and-dr.-higham">Thanks to Erika barthelmess and Dr.&nbsp;Higham</h2>
+</section>
+<section id="source" class="level2">
+<h2 class="anchored" data-anchor-id="source">Source</h2>
+<p>https://r4ds.had.co.nz/iteration.html?q=map(#the-map-functions (map())</p>
+<p>https://stackoverflow.com/questions/65589126/gap-in-polar-time-plot-how-to-connect-start-and-end-points-in-geom-line-or-rem (coord_polar())</p>
+<p>https://stackoverflow.com/questions/57497800/gganimate-transition-between-states-with-static-lines (gganimate())</p>
+<p>https://r4ds.had.co.nz/functions.html (function())</p>
+<p>https://highamm.github.io/ds234_quarto/11-lubridate.html#functions-for-date-variables (date())</p>
+<p>https://cran.r-project.org/web/packages/overlap/vignettes/overlap.pdf (overlap)</p>
+<p>https://bookdown.org/c_w_beirne/wildCo-Data-Analysis/ (Camera Trap)</p>
+<p>https://www.jstor.org/stable/pdf/20696577.pdf (Camera Trap)</p>
+<p>https://www.youtube.com/watch?v=uiA3znJb4KM (Presentation)</p>
+<p>Github</p>
+<p>Stack Overflow</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
