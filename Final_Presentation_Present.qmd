@@ -1,0 +1,296 @@
+---
+title: "Animated Time Plot for Camera Trap Data"
+subtitle: "by Oliver Fisher"
+format: 
+  revealjs:
+    embed-resources: true
+---
+
+```{r setup, echo=FALSE, include=FALSE}
+library(tidyverse)
+library(overlap)
+library(here)
+library(lubridate)
+library(gganimate)
+library(transformr)
+camera_df <- read_csv(here("data/camera_trap.csv"))
+```
+
+
+## Goal
+* To transform count data into a animated time plot to help visualize species density in a 24hr time frame throughout seasons.
+
+## Background
+```{r webshot, echo=FALSE, cache=TRUE, screenshot.opts=list(delay=3), fig.width=15, fig.cap="Click image to open website."}
+if(is.null(webshot:::find_phantom())) webshot::install_phantomjs()
+knitr::include_app('https://natureupnorth.shinyapps.io/NoCoWildShinyApp/')
+```
+
+
+
+```{r echo=FALSE, include=FALSE}
+without_date <- camera_df 
+get_interval_data <- function(date_choice, animal,
+                              plus_minus) {
+  interval_df <- camera_df |> 
+    mutate(time = mdy_hm(DTO), 
+           frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+           frac_week = (lubridate::wday(time, week_start = 1) - 1 + frac_day) / 7, 
+           frac_month = (day(time) - 1 + frac_day) / days_in_month(time),
+           time_of_day = round(frac_day, 3),
+           week = round(frac_week, 3),
+           month = round(frac_month, 3)) |>
+    mutate(day_of_year = yday(time)) |>
+    filter(day_of_year >= yday(ymd(date_choice)) - plus_minus &
+             day_of_year <= yday(ymd(date_choice)) + plus_minus) |>
+    filter(choice == animal) |>
+    mutate(timeRad = time_of_day * 2 * pi) |>
+    filter(year(time) != 2024) |> ## filter out 2024 data
+    select(time, day_of_year, everything())
+  
+  plot_obj <- densityPlot(interval_df$timeRad, rug = TRUE) |>
+    mutate(date_choice = date_choice,
+           n_obs = nrow(interval_df))
+  
+  rug_obj <- interval_df |> select(time) |>
+    mutate(date_choice = date_choice)
+  
+  return(list(plot_obj, rug_obj))
+}
+
+date_vec <- seq(ymd('2010-07-15'), ymd('2010-12-15'), by = "days")
+# Look at day and month as these are 
+```
+
+## Density Smoother
+
+* SQUIRRELGRAY centered at `2022-08-28` with 30 day window.
+
+```{r echo=FALSE, results = "hide"}
+test <- get_interval_data(date_choice = "2022-08-28", animal = "SQUIRRELGRAY",
+                  plus_minus = 15)
+test
+```
+
+* Ridout and Linkie (2009)
+
+## Data exploration
+
+```{r echo=FALSE}
+fix <- camera_df |> filter(choice == "DEERWHITETAILED" | choice == "SQUIRRELGRAY" | choice == "RACCOON" | choice == "WOODCHUCK" | choice == "BLACKBEAR" | choice == "COYOTE" | choice == "FISHER" | choice == "FOXRED")
+table(fix$choice) |> knitr::kable()
+```
+
+
+## Data exploration
+```{r echo=FALSE}
+camera_df2 <- camera_df |> 
+  separate(col = DTO, into = c("Date", "Time"), sep = " ") |>
+  mutate(Year = mdy(Date)) |>
+  select(Year, everything())
+test21 <- camera_df2 |> filter(lubridate::year(Year) %in% c(2021))
+table(range(test21$Year)) |> knitr::kable()
+test22 <- camera_df2 |> filter(lubridate::year(Year) %in% c(2022))
+table(range(test22$Year)) |> knitr::kable()
+test23 <- camera_df2 |> filter(lubridate::year(Year) %in% c(2023))
+table(range(test23$Year)) |> knitr::kable()
+```
+
+## Animation (Squirrel)
+```{r echo=FALSE, include=FALSE}
+map_out_grey <- map(date_vec, get_interval_data,
+               animal = "SQUIRRELGRAY",
+               plus_minus = 15)
+
+map_comb_grey <- pmap(map_out_grey, bind_rows, .id = "id")
+
+full_df_grey <- map_comb_grey[[1]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  filter(x >= -0.1 & x <= 24.1)
+
+full_rug_df_grey <- map_comb_grey[[2]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  mutate(frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+         time_Rad = frac_day * 24)
+
+
+anim_base_grey <- ggplot(data = full_df_grey, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  geom_rug(data = full_rug_df_grey, aes(x = time_Rad, y = NULL,
+                                   group = NULL)) +
+  theme_minimal(base_size = 18) +
+  labs(x = "Time of Day", y = "Observation Density") +
+  ylim(c(0, NA))
+```
+
+```{r echo=FALSE, cache = TRUE}
+Final_Plot_Base_grey <- anim_base_grey + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_Base_grey
+```
+
+
+## Animation (Raccoon)
+```{r echo=FALSE, include=FALSE}
+map_out_robber <- map(date_vec, get_interval_data,
+               animal = "RACCOON",
+               plus_minus = 15)
+
+map_comb_robber <- pmap(map_out_robber, bind_rows, .id = "id")
+
+full_df_robber <- map_comb_robber[[1]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  filter(x >= -0.1 & x <= 24.1)
+
+full_rug_df_robber <- map_comb_robber[[2]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  mutate(frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+         time_Rad = frac_day * 24)
+
+
+anim_base_robber <- ggplot(data = full_df_robber, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  geom_rug(data = full_rug_df_robber, aes(x = time_Rad, y = NULL,
+                                   group = NULL)) +
+  theme_minimal(base_size = 18) +
+  labs(x = "Time of Day", y = "Observation Density") +
+  ylim(c(0, NA))
+```
+
+```{r echo=FALSE, cache = TRUE}
+
+Final_Plot_Base_robber <- anim_base_robber + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_Base_robber
+```
+
+## Animation (Raccoon 60 days)
+```{r echo=FALSE, include=FALSE}
+map_out_robber_30 <- map(date_vec, get_interval_data,
+               animal = "RACCOON",
+               plus_minus = 30)
+
+map_comb_robber_30 <- pmap(map_out_robber_30, bind_rows, .id = "id")
+
+full_df_robber_30 <- map_comb_robber_30[[1]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  filter(x >= -0.1 & x <= 24.1)
+
+full_rug_df_robber_30 <- map_comb_robber_30[[2]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  mutate(frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+         time_Rad = frac_day * 24)
+
+
+anim_base_robber_30 <- ggplot(data = full_df_robber_30, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  geom_rug(data = full_rug_df_robber_30, aes(x = time_Rad, y = NULL,
+                                   group = NULL)) +
+  theme_minimal(base_size = 18) +
+  labs(x = "Time of Day", y = "Observation Density") +
+  ylim(c(0, NA))
+```
+
+```{r echo=FALSE, cache = TRUE}
+
+Final_Plot_Base_robber_30 <- anim_base_robber_30 + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_Base_robber_30
+```
+
+
+## Animation (deer)
+```{r echo=FALSE, include=FALSE}
+date_vec_deer <- date_vec[1:130]
+map_out_deer <- map(date_vec_deer, get_interval_data,
+               animal = "DEERWHITETAILED",
+               plus_minus = 15)
+
+map_comb_deer <- pmap(map_out_deer, bind_rows, .id = "id")
+
+full_df_deer <- map_comb_deer[[1]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  filter(x >= -0.1 & x <= 24.1)
+
+full_rug_df_deer <- map_comb_deer[[2]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  mutate(frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+         time_Rad = frac_day * 24)
+
+
+anim_base <- ggplot(data = full_df_deer, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  geom_rug(data = full_rug_df_deer, aes(x = time_Rad, y = NULL,
+                                   group = NULL)) +
+  theme_minimal(base_size = 18) +
+  labs(x = "Time of Day", y = "Observation Density") +
+  ylim(c(0, NA))
+
+
+anim_circle <- ggplot(data = full_df_deer, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  coord_polar() +
+  theme_minimal() +
+  scale_x_continuous(breaks = seq(0, 24, by = 1), expand = c(0, 0)) +
+  ylim(0,0.15) +
+  labs(x = 'Species', y = 'Observation Density')
+
+```
+
+```{r echo=FALSE}
+Final_Plot_Base <- anim_base + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_Base
+
+Final_Plot_circle <- anim_circle + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_circle
+```
+
+
+## Circular Animation (deer)
+```{r}
+Final_Plot_circle <- anim_circle + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_circle
+```
+
+
+## Thank you Dr. Erika barthelmess & Dr. Matt Higham
+
+
+## Source
+
+<!-- https://r4ds.had.co.nz/iteration.html?q=map(#the-map-functions (map()) -->
+
+<!-- https://stackoverflow.com/questions/65589126/gap-in-polar-time-plot-how-to-connect-start-and-end-points-in-geom-line-or-rem (coord_polar()) -->
+
+<!-- https://stackoverflow.com/questions/57497800/gganimate-transition-between-states-with-static-lines (gganimate()) -->
+
+<!-- https://r4ds.had.co.nz/functions.html (function()) -->
+
+<!-- https://highamm.github.io/ds234_quarto/11-lubridate.html#functions-for-date-variables (date()) -->
+
+<https://cran.r-project.org/web/packages/overlap/vignettes/overlap.pdf> (overlap)
+
+<https://bookdown.org/c_w_beirne/wildCo-Data-Analysis/> (Camera Trap)
+
+<https://www.jstor.org/stable/pdf/20696577.pdf> (Camera Trap)
+
+<!-- https://www.youtube.com/watch?v=uiA3znJb4KM (Presentation) -->
+
+<!-- Github -->
+
+<!-- Stack Overflow -->

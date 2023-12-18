@@ -1,0 +1,332 @@
+---
+title: "Report Write Up"
+format: docx
+---
+
+# Animated Time Plot for Camera Trap Data 
+
+## Purpose
+The goal this project is to transform count data into an animated time plot to help visualize species density in a 24hr time frame throughout seasons. The data is collected over a period of three years from camera traps placed at Degrasse, Kip tract, Donnerville, Lampson, Donnerville (Ash), Lampson Falls, ELB, Peavine, Kip, and South Hammond. The ecology of these locations are comprised of deciduous forestry, wetlands (and their derivatives), agricultural fields, and developments. These locations are chosen to give a fair representation of the greater St. Lawrence County. The collection method is camera trap which is comprised of a motion detector camera mounted to a solid structure. The operations of these camera traps samplers are to take a picture of anything that passes in front of the motion detector. The data is then collected and analyzed by volunteers who mark the date, time, and species type captured within the photograph; making sure to remove any duplicates or errors taken by the camera traps. The information is then uploaded to the provided data frame. 
+
+```{r}
+library(tidyverse)
+library(overlap)
+library(here)
+library(lubridate)
+library(gganimate)
+library(transformr)
+```
+
+*```{r webshot, echo=FALSE, cache=TRUE, screenshot.opts=list(delay=3), fig.width=15, fig.cap="Click image to open website."}
+if(is.null(webshot:::find_phantom())) webshot::install_phantomjs()
+knitr::include_app('https://natureupnorth.shinyapps.io/NoCoWildShinyApp/')
+*```
+<https://natureupnorth.shinyapps.io/NoCoWildShinyApp/>
+
+This project was inspired both by a interest in environmental studies and the substance of the website above. Created in 2020 by honors student Kate Andy the website details information from the North Country Wild Project, a culmination of information detailing the density, distribution, and abundance of wildlife found in the greater St. Lawrence County. In the website there can be found bar charts detailing count of species and distribution of total sightings described in a 24 hour plot.  The shortcomings of these plots and ultimately the foundation of this honors project is the visualization of wildlife distribution over time. 
+
+
+## Data explotation 
+```{r}
+camera_df <- read_csv(here("data/camera_trap.csv"))
+```
+
+The data set is comprised of 2127 cases, each case represents an individual observation. The variables that detail each case are as such; '…1' is the relative index number for each case in this data set. 'subject_ids' is the absolute index number for each photo. 'img1' 'img2' & 'img3' are the three JPG references for each photo. 'forest' is the location at which the camera trap was placed and the subsequent photo was taken. 'DTO' is the date (given in month/day/year) and time (given in hour: minute) at which the photo was taken.  'subject_set_id' indexes the three distinct periods in which the data was collected and uploaded to the data frame (103437 for periods 7/3/21 to 12/4/21) (108373 for periods 7/3/21 to 12/4/21) (112935 for period 2/3/23 to 4/1/23). 'choice' describes the specific species that was captured within the given photograph. The specific observed species are as such; marten, beaver, black bear, blue Jay, rabbit, coyote, raven, dog, fisher, grey fox, red fox, wild goose, grouse ruffed, mink, mole, mountain loin, opossum, other domestic live stock, owl, porcupine, reptile or Amphibian, river otter, snow shoe hare, flying squirrel, red squirrel, turkey, weasel, woodchuck, chipmunk, white tailed deer, other birds, other small mammal, raccoon, and gray squirrel. 
+
+```{r}
+camera_df2 <- camera_df |> 
+  separate(col = DTO, into = c("Date", "Time"), sep = " ") |>
+  mutate(Year = mdy(Date)) |>
+  select(Year, everything())
+test21 <- camera_df2 |> filter(lubridate::year(Year) %in% c(2021))
+table(range(test21$Year)) |> knitr::kable()
+test22 <- camera_df2 |> filter(lubridate::year(Year) %in% c(2022))
+table(range(test22$Year)) |> knitr::kable()
+test23 <- camera_df2 |> filter(lubridate::year(Year) %in% c(2023))
+table(range(test23$Year)) |> knitr::kable()
+```
+
+
+After evaluation of the data and its sampling methods we find some constraints. Count traps can be very beneficial and very limited, the benefit of a camera trap is one can plant the device and walk away a sampling of convenience, allowing for the observation of species that would otherwise avoid human contact. The limitation of this device is perception as the device only takes a picture when a subject moves within the range of its visibility which is approximately 90° and a maximum of 80-100 feet. Given the confined range of sight any subject not within view of that range will not be recorded even if it is present in the area. For reasons of sampling the camera traps are also only present five months out of the year. Additionally the data only goes up until 4/1/23, though the camera traps are still present to date, the data has only been analyzed up to that date. 
+
+```{r}
+table(camera_df$choice) |> knitr::kable()
+```
+
+Above is a table of count for each species captured. In it we find the one of the most significant constraints for this project. Much of the species only have counts ranging from 1 to 30 which for is too limited for longitudinal density plotting. Therefore for the purposes of this project we will specifically focus on Raccoon (259), Grey Squirrel (539), and white tail deer (532) for observation. 
+
+
+## Overlap
+The foundation of our final animated plot is based upon the density smoother curve created within the overlap package (Ridout and Linkie 2009). To achieve the said plot, our given data must first be transformed from the digital hour, minute, second time into a proportion of 24 hours using the lubricate package to express time as a quantitative range of 0 to 1. Then using a conversion factor the outputs are translated into radians. This output may be then fitted to a kernel density function which is then used to plot a kernel density curve.
+
+```{r}
+## Convert 0:00 to 23:59 => 0 to 0.99
+## https://stackoverflow.com/questions/67613393/convert-time-to-fraction-of-a-day-fraction-of-a-week-and-fraction-of-a-month-in
+camera_df2 <- camera_df |> mutate(time = mdy_hm(DTO), 
+         frac_day = ((hour(time)*60 + minute(time))/60)/24,
+         frac_week = (lubridate::wday(time, week_start = 1) - 1 + frac_day)/7, 
+         frac_month = (day(time) - 1 + frac_day)/days_in_month(time),
+         time = round(frac_day,3),
+         week = round(frac_week,3),
+         month = round(frac_month,3),)
+
+range(camera_df2$time)
+
+## Convert radians to degrees
+timeRad <- camera_df2$time * 2 * pi
+
+## Fitting kernel density
+deer <- timeRad[camera_df2$choice == 'DEERWHITETAILED']
+
+densityPlot(deer, rug=TRUE)
+```
+
+Figure 1: Fitted kernel density curve for white tail deer.
+
+Figure 1 appears to show a uni-modal activity pattern with a peaks activity pattern at around 7:00 am and about 8:00 pm, with activity lulls occurring around 3:00 am and 3:00 pm. The major benefit of using this plot is it uses a von Mises kernel, which is corresponding to a circular distribution. This circular distribution allows a connection at both beginning and end of the curve line allowing for a smooth transition when applied to an animated plot. The individual observations corresponding to the times of day within the 24 hour, are shown as dashes featured at the very bottom of the plot, it is the output of ‘rug=TRUE’ in the function provided by the overlap package.
+
+
+## Function
+To visualize the transformation necessary to create an animated version of the kernel density smoother plot in figure 1 we must think about the data input as film stock, each plot of a 24 hour period a single frame, and every film frame shot on a single set scene. The characters of this metaphorical movie or the observational points so that as the movie progresses, we see the individual characters move in, out, and around that set that remains fixed, giving the plot we create the impression of animation. The function below begins the process of transforming the given dataset into sub datasets, centered each date. The function takes 3 inputs;  the day of the year (date_choice), animal of interest (animal), and time period interval (plus_minus). 
+
+```{r}
+without_date <- camera_df 
+get_interval_data <- function(date_choice, animal,
+                              plus_minus) {
+  interval_df <- camera_df |> 
+    mutate(time = mdy_hm(DTO), 
+           frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+           frac_week = (lubridate::wday(time, week_start = 1) - 1 + frac_day) / 7, 
+           frac_month = (day(time) - 1 + frac_day) / days_in_month(time),
+           time_of_day = round(frac_day, 3),
+           week = round(frac_week, 3),
+           month = round(frac_month, 3)) |>
+    mutate(day_of_year = yday(time)) |>
+    filter(day_of_year >= yday(ymd(date_choice)) - plus_minus &
+             day_of_year <= yday(ymd(date_choice)) + plus_minus) |>
+    filter(choice == animal) |>
+    mutate(timeRad = time_of_day * 2 * pi) |>
+    filter(year(time) != 2024) |> ## filter out 2024 data
+    select(time, day_of_year, everything())
+  
+  plot_obj <- densityPlot(interval_df$timeRad, rug = TRUE) |>
+    mutate(date_choice = date_choice,
+           n_obs = nrow(interval_df))
+  
+  rug_obj <- interval_df |> select(time) |>
+    mutate(date_choice = date_choice)
+  
+  return(list(plot_obj, rug_obj))
+}
+
+```
+
+The function transforms the given time and day (DTO) into a proportion of 24 hours, to create the variable ‘day_of_year’. The individual days within that new variable are then added and subtracted by a specified period of days, manipulated by input ‘plus_minus’. The data frame is then filtered for a specific animal, manipulated by input ‘animal’. We then transform the proportion of 24 hours into radians and account for any errors within the data set by eliminating days ending in 2024, an error that does occur in the original data set. The data is then filter down further to only produce cases within the specified time window. That output is then applied to our density smoother plot, with respective observational tallies, using the ‘rug’ function. The output is then the respective kernel density smoother plot for the specified species of interest and specified window This output can be thought of as the individual film frames.
+
+## Output (plot)
+```{r results = "hide"}
+get_interval_data(date_choice = "2022-08-28", animal = "SQUIRRELGRAY",
+                  plus_minus = 15)
+```
+
+Figure 2: Fitted kernel density curve from output of function for Grey Squirrel centered a `2022-08-28` with 30 day window.
+
+
+## Plot (gganimate)
+To anchor the data we use function seq() which creates a sequence of 183 days, July 15th to Dec 15th. We then use function map() to marry the sequence of days to our other specified inputs, animal and plus_minus, this creates a structured input system mapped to our function across a 24 hour period with collapsed years. Coupled with function pmap() we can then iterate our input over two arguments; the output of our function and the day sequences for the base plots which then creates a string of plots. Finally using ggplot from the gganimate package we collapse all 183 output plots, into one animated density smoother plot. The blue line indicates the smoother density curve and black tick marks on the bottom bar indicating observations from the current day window, featured in the upper left hand corner, with Faded Gray lines indicating prior days. As seen below in figure 3-6.  
+
+### Animation (Squirrel)
+```{r  include=FALSE}
+date_vec <- seq(ymd('2010-07-15'), ymd('2010-12-15'), by = "days")
+# Look at day and month as these are 
+
+map_out_grey <- map(date_vec, get_interval_data,
+               animal = "SQUIRRELGRAY",
+               plus_minus = 15)
+
+map_comb_grey <- pmap(map_out_grey, bind_rows, .id = "id")
+
+full_df_grey <- map_comb_grey[[1]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  filter(x >= -0.1 & x <= 24.1)
+
+full_rug_df_grey <- map_comb_grey[[2]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  mutate(frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+         time_Rad = frac_day * 24)
+
+
+anim_base_grey <- ggplot(data = full_df_grey, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  geom_rug(data = full_rug_df_grey, aes(x = time_Rad, y = NULL,
+                                   group = NULL)) +
+  theme_minimal(base_size = 18) +
+  labs(x = "Time of Day", y = "Observation Density") +
+  ylim(c(0, NA))
+```
+
+```{r echo=FALSE, cache = TRUE}
+Final_Plot_Base_grey <- anim_base_grey + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_Base_grey
+```
+
+Figure 3: Animated density smoother plot for Grey Squirrels in 30 day window
+
+### Animation (Raccoon)
+```{r echo=TRUE, include=FALSE}
+map_out_robber <- map(date_vec, get_interval_data,
+               animal = "RACCOON",
+               plus_minus = 15)
+
+map_comb_robber <- pmap(map_out_robber, bind_rows, .id = "id")
+
+full_df_robber <- map_comb_robber[[1]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  filter(x >= -0.1 & x <= 24.1)
+
+full_rug_df_robber <- map_comb_robber[[2]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  mutate(frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+         time_Rad = frac_day * 24)
+
+
+anim_base_robber <- ggplot(data = full_df_robber, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  geom_rug(data = full_rug_df_robber, aes(x = time_Rad, y = NULL,
+                                   group = NULL)) +
+  theme_minimal(base_size = 18) +
+  labs(x = "Time of Day", y = "Observation Density") +
+  ylim(c(0, NA))
+```
+
+```{r echo=TRUE, cache = TRUE}
+
+Final_Plot_Base_robber <- anim_base_robber + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_Base_robber
+```
+
+Figure 4: Animated density smoother plot for Raccoon in 30 day window
+
+### Animation (Raccoon 60 days)
+```{r echo=TRUE, include=FALSE}
+map_out_robber_30 <- map(date_vec, get_interval_data,
+               animal = "RACCOON",
+               plus_minus = 30)
+
+map_comb_robber_30 <- pmap(map_out_robber_30, bind_rows, .id = "id")
+
+full_df_robber_30 <- map_comb_robber_30[[1]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  filter(x >= -0.1 & x <= 24.1)
+
+full_rug_df_robber_30 <- map_comb_robber_30[[2]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  mutate(frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+         time_Rad = frac_day * 24)
+
+
+anim_base_robber_30 <- ggplot(data = full_df_robber_30, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  geom_rug(data = full_rug_df_robber_30, aes(x = time_Rad, y = NULL,
+                                   group = NULL)) +
+  theme_minimal(base_size = 18) +
+  labs(x = "Time of Day", y = "Observation Density") +
+  ylim(c(0, NA))
+```
+
+```{r echo=TRUE, cache = TRUE}
+
+Final_Plot_Base_robber_30 <- anim_base_robber_30 + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_Base_robber_30
+```
+
+Figure 5: Animated density smoother plot for Raccoon in 60 day window
+
+
+### Animation (deer)
+```{r echo=TRUE, include=FALSE}
+date_vec_deer <- date_vec[1:130]
+map_out_deer <- map(date_vec_deer, get_interval_data,
+               animal = "DEERWHITETAILED",
+               plus_minus = 15)
+
+map_comb_deer <- pmap(map_out_deer, bind_rows, .id = "id")
+
+full_df_deer <- map_comb_deer[[1]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  filter(x >= -0.1 & x <= 24.1)
+
+full_rug_df_deer <- map_comb_deer[[2]] |> as_tibble() |>
+  mutate(id = as.numeric(id)) |>
+  mutate(frac_day = ((hour(time) * 60 + minute(time)) / 60) / 24,
+         time_Rad = frac_day * 24)
+
+
+anim_base <- ggplot(data = full_df_deer, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  geom_rug(data = full_rug_df_deer, aes(x = time_Rad, y = NULL,
+                                   group = NULL)) +
+  theme_minimal(base_size = 18) +
+  labs(x = "Time of Day", y = "Observation Density") +
+  ylim(c(0, NA))
+
+
+anim_circle <- ggplot(data = full_df_deer, aes(x = x, y = y, group = id)) +
+  geom_line(colour = "blue", linewidth = 2) +
+  coord_polar() +
+  theme_minimal() +
+  scale_x_continuous(breaks = seq(0, 24, by = 1), expand = c(0, 0)) +
+  ylim(0,0.15) +
+  labs(x = 'Species', y = 'Observation Density')
+
+```
+
+```{r}
+Final_Plot_Base <- anim_base + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_Base
+
+Final_Plot_circle <- anim_circle + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_circle
+```
+
+Figure 6: Animated density smoother plot for White Tail Deer in 30 day window
+
+### Circular Animation (deer)
+```{r}
+Final_Plot_circle <- anim_circle + transition_time(date_choice) +
+  labs(title = "Month-Day: {format(frame_time, '%m-%d')}") +
+  shadow_mark(colour = "black", linewidth = 0.25, alpha = 0.15,
+              exclude_layer = 2)
+Final_Plot_circle
+```
+Figure 7: Animated circular density smoother plot for White Tail Deer in 30 day window
+
+Figure 7 shows a circular version of the density smoother plot similar to that of the previous plots in overall construction, the circular plot instead uses coord_polar() to iterate the mapped outputs into a 360 degree plot. The circular plot was the original goal of this honors project however upon its creation we found that it failed to sufficiently accommodate for the most chaotic of data frame. As can be seen in figure 7 in which the pattern becomes muddled and difficult to easily visualize the species distribution overtime, when compared to the prior linear density smoother plot.
+
+## Thank you
+Thank you to Dr. Erika Barthelmess for providing the data set used in this project. And a huge thank you to my honors project advisor Dr. Matt Higham for providing resources support and advice throughout this project.
+
+
+## Source
+
+<https://cran.r-project.org/web/packages/overlap/vignettes/overlap.pdf> (overlap)
+
+<https://bookdown.org/c_w_beirne/wildCo-Data-Analysis/> (Camera Trap)
+
+<https://www.jstor.org/stable/pdf/20696577.pdf> (Camera Trap)
+
